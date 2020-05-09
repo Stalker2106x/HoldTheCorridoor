@@ -40,12 +40,10 @@ public class PlayerController : MonoBehaviour
 
   public void Init()
   {
-    var defaultWeapon = Instantiate(FindObjectOfType<ArsenalController>().weapons[0], transform, false);
-    defaultWeapon.name = "Weapon";
-    _weapon = transform.Find("Weapon").GetComponent<WeaponController>();
+    Equip(FindObjectOfType<ArsenalController>().weapons[0]);
     _state = PlayerState.Active;
     _health = 100;
-    _resources = 900;
+    _resources = 75000;
     _speed = 5;
     transform.position = new Vector3(31.14f, 1f, 12.61f);
     _weapon.Init();
@@ -54,8 +52,25 @@ public class PlayerController : MonoBehaviour
     FindObjectOfType<UIController>().SetResourcesIndicator(_resources);
   }
 
+  public void Equip(GameObject weapon)
+  {
+    //Unequip previous
+    if (_weapon)
+    {
+      var oldWeapon = _weapon.gameObject;
+      oldWeapon.SetActive(false);
+      oldWeapon.transform.parent = FindObjectOfType<WorkbenchController>().transform;
+    }
+    //Equip new
+    weapon.SetActive(true);
+    weapon.transform.SetParent(gameObject.transform, false);
+    _weapon = transform.Find("Weapon").GetComponent<WeaponController>();
+
+  }
+
   public void SetState(PlayerState state)
   {
+    if (_state == PlayerState.Active && state != PlayerState.Active) _animator.SetBool("Walking", false);
     _state = state;
   }
 
@@ -111,7 +126,7 @@ public class PlayerController : MonoBehaviour
     }
     if (Vector3.Distance(transform.position, GameObject.Find("Workbench").transform.position) < 4)
     {
-      _state = PlayerState.Inactive;
+      SetState(PlayerState.Inactive);
       FindObjectOfType<UIController>().SetWorkbenchUI(true);
     }
   }
@@ -124,7 +139,7 @@ public class PlayerController : MonoBehaviour
   void Update()
   {
     if (_state != PlayerState.Active) return;
-    Vector3 move = new Vector3(0, 0, 0);
+    Vector3 move = new Vector3(Input.GetAxisRaw("Horizontal"), 0, Input.GetAxisRaw("Vertical"));
     RaycastHit hit;
     Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
 
@@ -133,35 +148,10 @@ public class PlayerController : MonoBehaviour
       var target = new Vector3(hit.point.x, transform.position.y, hit.point.z);
       transform.LookAt(target);
     }
-    if (Input.GetMouseButtonDown(0))
-    {
-      Fire();
-    }
-    if (Input.GetKey(KeyCode.Z))
-    {
-      move += new Vector3(0, 0, 1);
-    }
-    if (Input.GetKey(KeyCode.S))
-    {
-      move += new Vector3(0, 0, -1);
-    }
-    if (Input.GetKey(KeyCode.Q))
-    {
-      move += new Vector3(-1, 0, 0);
-    }
-    if (Input.GetKey(KeyCode.D))
-    {
-      move += new Vector3(1, 0, 0);
-    }
-    if (Input.GetKeyDown(KeyCode.R))
-    {
-      Reload();
-    }
-    if (Input.GetKeyDown(KeyCode.E))
-    {
-      Interact();
-    }
-    transform.Translate(move * (_speed * (1 + (speedUpgrade * 0.1f))) * Time.deltaTime, Space.World);
+    if (Input.GetMouseButton(0) && _weapon.fireMode == FireMode.Auto || Input.GetMouseButtonDown(0) && _weapon.fireMode == FireMode.SemiAuto) Fire();
+    if (Input.GetKeyDown(KeyCode.R)) Reload();
+    if (Input.GetKeyDown(KeyCode.E)) Interact();
+    transform.Translate(move * _speed * Time.deltaTime, Space.World);
     _stepTimer -= Time.deltaTime;
     if (move.magnitude != 0 && _stepTimer <= 0)
     {

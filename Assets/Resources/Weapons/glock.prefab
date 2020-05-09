@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 6330115197165121119}
   - component: {fileID: 7810396855311372111}
   m_Layer: 9
-  m_Name: Weapon
+  m_Name: glock
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -49,6 +49,9 @@ MonoBehaviour:
   gunshotSound: {fileID: 8300000, guid: 309899f3ad33b1b4baf693724d02edc0, type: 3}
   reloadSound: {fileID: 8300000, guid: 40089b3602c9c5b428c911a6cd4e6a90, type: 3}
   dryfireSound: {fileID: 8300000, guid: 5b7748ae9b2bf9340999dd3b5942803a, type: 3}
+  damage: 20
+  maxAmmo: 12
+  fireMode: 0
   damageUpgrade: 0
   magazineUpgrade: 0
 --- !u!82 &7810396855311372111

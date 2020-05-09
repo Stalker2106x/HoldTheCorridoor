@@ -20,14 +20,19 @@ public class CreatureController : MonoBehaviour
   // Start is called before the first frame update
   void Start()
   {
-    _speed = 2.5f;
-    _health = 100;
-    _damage = 10;
     _soundTimer = 3f;
     _attackTimer = 0f;
     _animator = GetComponent<Animator>();
     _audioEmitter = GetComponent<AudioSource>();
   }
+
+  public void Init(int health, int damage, float speed)
+  {
+    _health = health;
+    _damage = damage;
+    _speed = speed;
+  }
+
   private void OnCollisionEnter(Collision collision)
   {
     BulletController bullet;

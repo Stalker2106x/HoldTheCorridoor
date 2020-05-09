@@ -5,7 +5,14 @@ using UnityEngine;
 enum WeaponState
 {
   Idle,
+  Cooldown,
   Reloading
+}
+
+public enum FireMode
+{
+  SemiAuto,
+  Auto
 }
 
 public class WeaponController : MonoBehaviour
@@ -19,9 +26,17 @@ public class WeaponController : MonoBehaviour
   [SerializeField]
   AudioClip dryfireSound;
 
-  int _damage;
+  [SerializeField]
+  int damage;
+
+  [SerializeField]
+  int maxAmmo = 10;
+
+  [SerializeField]
+  public FireMode fireMode;
+
+  public bool unlocked;
   int _ammo;
-  int _maxAmmo = 10;
   WeaponState _state;
   AudioSource _audioEmitter;
 
@@ -29,10 +44,12 @@ public class WeaponController : MonoBehaviour
   public int magazineUpgrade;
 
   float _reloadTimer;
+  float _cooldownTimer;
 
   // Start is called before the first frame update
   void Start()
   {
+    _cooldownTimer = 0.1f;
   }
 
   public void Init()
@@ -41,20 +58,19 @@ public class WeaponController : MonoBehaviour
     magazineUpgrade = 0;
     damageUpgrade = 0;
     _state = WeaponState.Idle;
-    _damage = 20;
-    _ammo = _maxAmmo;
-    _maxAmmo = 10;
+    _ammo = maxAmmo;
     UpdateUI();
   }
 
   public void UpdateUI()
   {
-    FindObjectOfType<UIController>().SetAmmoIndicator(_ammo, _maxAmmo + (magazineUpgrade * 2));
+    FindObjectOfType<UIController>().SetAmmoIndicator(_ammo, maxAmmo + (magazineUpgrade * 2));
   }
 
   public bool Fire()
   {
-    if (_ammo == 0 || _state == WeaponState.Reloading)
+    if (_state != WeaponState.Idle) return (false);
+    if (_ammo == 0)
     {
       if (_ammo == 0) _audioEmitter.PlayOneShot(dryfireSound);
       return (false);
@@ -62,15 +78,16 @@ public class WeaponController : MonoBehaviour
     _audioEmitter.PlayOneShot(gunshotSound);
     var target = new Vector3(transform.position.x, 2, transform.position.z) + transform.forward;
     var bullet = Instantiate(bulletPrefab, target, transform.rotation);
-    bullet.GetComponent<BulletController>().damage = (int)(_damage * (1 + (damageUpgrade * 0.1f)));
+    bullet.GetComponent<BulletController>().damage = (int)(damage * (1 + (damageUpgrade * 0.25f)));
     _ammo--;
+    _state = WeaponState.Cooldown;
     UpdateUI();
     return (true);
   }
 
   public bool Reload()
   {
-    if (_ammo == _maxAmmo || _state == WeaponState.Reloading) return (false);
+    if (_ammo == maxAmmo + (magazineUpgrade * 2) || _state == WeaponState.Reloading) return (false);
     _audioEmitter.PlayOneShot(reloadSound);
     _state = WeaponState.Reloading;
     _reloadTimer = 1.2f;
@@ -80,7 +97,7 @@ public class WeaponController : MonoBehaviour
   public void EndReload()
   {
     _state = WeaponState.Idle;
-    _ammo = _maxAmmo + (magazineUpgrade * 2);
+    _ammo = maxAmmo + (magazineUpgrade * 2);
     UpdateUI();
   }
 
@@ -93,6 +110,15 @@ public class WeaponController : MonoBehaviour
       if (_reloadTimer <= 0)
       {
         EndReload();
+      }
+    }
+    if (_state == WeaponState.Cooldown)
+    {
+      _cooldownTimer -= Time.deltaTime;
+      if (_cooldownTimer <= 0)
+      {
+        _state = WeaponState.Idle;
+        _cooldownTimer = 0.1f;
       }
     }
   }

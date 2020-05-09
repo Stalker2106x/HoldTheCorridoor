@@ -11,25 +11,66 @@ public class WorkbenchController : MonoBehaviour
   {
   }
 
-  public void RefreshPanel()
+  public void SetDataList(int weaponIndex)
   {
-    SetDataList();
-  }
-
-  public void SetDataList()
-  {
-    var weapon = FindObjectOfType<ArsenalController>().weapons[0].GetComponent<WeaponController>();
+    ResetCheckStates(weaponIndex);
+    var weapon = FindObjectOfType<ArsenalController>().weapons[weaponIndex].GetComponent<WeaponController>();
+    if (!weapon.unlocked)
+    {
+      SetUnlockPanel(weaponIndex);
+      return;
+    }
+    transform.Find("WeaponSelect/UnlockPanel").gameObject.SetActive(false);
+    var equipBtn = transform.Find("WeaponSelect/EquipBtn");
+    equipBtn.gameObject.SetActive(true);
+    equipBtn.GetComponent<Button>().onClick.AddListener(() =>
+    {
+      FindObjectOfType<PlayerController>().Equip(FindObjectOfType<ArsenalController>().weapons[weaponIndex]);
+    });
     var dataList = transform.Find("WeaponSelect/DataList");
     //DamageElement
     var damageElement = dataList.transform.Find("DamageElement");
-    damageElement.Find("UpgradeBtn/Text").GetComponent<Text>().text = string.Format("Upgrade (λ{0})", (weapon.magazineUpgrade + 1) * 75);
+    damageElement.Find("UpgradeBtn").GetComponent<Button>().onClick.AddListener(() =>
+    {
+      UpgradeDamage(weaponIndex);
+    });
+    damageElement.Find("UpgradeBtn/Text").GetComponent<Text>().text = string.Format("Upgrade Lvl.{0} (λ{1})", (weapon.magazineUpgrade + 1), (weapon.damageUpgrade + 1) * 75);
     var damageUpgrades = damageElement.GetComponentsInChildren<Transform>().Where(t => t.name == "UpgradeIndicator").ToArray();
-    for (int i = 0; i < weapon.damageUpgrade; i++) damageUpgrades[i].GetComponent<Image>().color = Color.green;
+    for (int i = 0; i < weapon.damageUpgrade; i++) damageUpgrades[i].GetComponent<Image>().color = Color.yellow;
     //MagazineElement
     var magazineElement = dataList.transform.Find("MagazineElement");
-    magazineElement.Find("UpgradeBtn/Text").GetComponent<Text>().text = string.Format("Upgrade (λ{0})", (weapon.magazineUpgrade + 1) * 75);
+    magazineElement.Find("UpgradeBtn").GetComponent<Button>().onClick.AddListener(() =>
+    {
+      UpgradeMagazine(weaponIndex);
+    });
+    magazineElement.Find("UpgradeBtn/Text").GetComponent<Text>().text = string.Format("Upgrade Lvl.{0} (λ{1})", (weapon.magazineUpgrade + 1), (weapon.magazineUpgrade + 1) * 75);
     var magazineUpgrades = magazineElement.GetComponentsInChildren<Transform>().Where(t => t.name == "UpgradeIndicator").ToArray();
-    for (int i = 0; i < weapon.magazineUpgrade; i++) magazineUpgrades[i].GetComponent<Image>().color = Color.green;
+    for (int i = 0; i < weapon.magazineUpgrade; i++) magazineUpgrades[i].GetComponent<Image>().color = Color.yellow;
+  }
+
+  public void SetUnlockPanel(int weaponIndex)
+  {
+    var player = FindObjectOfType<PlayerController>();
+    var unlockPanel = transform.Find("WeaponSelect/UnlockPanel");
+    unlockPanel.gameObject.SetActive(true);
+    transform.Find("WeaponSelect/EquipBtn").gameObject.SetActive(false);
+    unlockPanel.Find("UnlockBtn").GetComponent<Button>().onClick.AddListener(() =>
+    {
+      if (!player.Pay(2500)) return;
+      FindObjectOfType<ArsenalController>().weapons[weaponIndex].GetComponent<WeaponController>().unlocked = true;
+      SetDataList(weaponIndex);
+    });
+  }
+
+  public void ResetCheckStates(int weaponIndex)
+  {
+    var scrollView = transform.Find("WeaponSelect/WeaponScroll/Viewport/Content");
+    int index = 0;
+    foreach (Transform child in scrollView)
+    {
+      child.GetComponent<Toggle>().isOn = (index == weaponIndex);
+      index++;
+    }
   }
 
   public void ClosePanel()
@@ -38,33 +79,31 @@ public class WorkbenchController : MonoBehaviour
   }
 
 
-  public void UpgradeMagazine()
+  public void UpgradeMagazine(int weaponIndex)
   {
-    var weapon = FindObjectOfType<ArsenalController>().weapons[0].GetComponent<WeaponController>();
+    var weapon = FindObjectOfType<ArsenalController>().weapons[weaponIndex];
+    var weaponController = weapon.GetComponent<WeaponController>();
     var player = FindObjectOfType<PlayerController>();
 
-    if (!player.Pay((weapon.magazineUpgrade + 1) * 75)) return;
-    weapon.magazineUpgrade++;
-    weapon.UpdateUI();
-    RefreshPanel();
+    if (weaponController.magazineUpgrade >= 5) return; //5 levels
+    if (!player.Pay((weaponController.magazineUpgrade + 1) * 75)) return;
+    weaponController.magazineUpgrade++;
+    weaponController.UpdateUI();
+    player.Equip(weapon);
+    SetDataList(weaponIndex);
   }
-  public void UpgradeDamage()
+  public void UpgradeDamage(int weaponIndex)
   {
-    var weapon = FindObjectOfType<ArsenalController>().weapons[0].GetComponent<WeaponController>();
+    var weapon = FindObjectOfType<ArsenalController>().weapons[weaponIndex];
+    var weaponController = weapon.GetComponent<WeaponController>();
     var player = FindObjectOfType<PlayerController>();
 
-    if (!player.Pay((weapon.damageUpgrade + 1) * 75)) return;
-    weapon.damageUpgrade++;
-    weapon.UpdateUI();
-    RefreshPanel();
-  }
-  public void UpgradeSpeed()
-  {
-    var player = FindObjectOfType<PlayerController>();
-
-    if (!player.Pay((player.speedUpgrade + 1) * 75)) return;
-    FindObjectOfType<PlayerController>().speedUpgrade++;
-    RefreshPanel();
+    if (weaponController.damageUpgrade >= 5) return; //5 levels
+    if (!player.Pay((weaponController.damageUpgrade + 1) * 75)) return;
+    weaponController.damageUpgrade++;
+    weaponController.UpdateUI();
+    player.Equip(weapon);
+    SetDataList(weaponIndex);
   }
 
   // Update is called once per frame

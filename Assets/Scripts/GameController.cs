@@ -4,22 +4,24 @@ using UnityEngine;
 
 public class GameController : MonoBehaviour
 {
-  List<System.Tuple<float, int>> wavesDefinition = new List < System.Tuple<float, int> >
+  List<WaveDefinition> wavesDefinition = new List <WaveDefinition>
   {
-    new System.Tuple<float, int>(0f, 0),
-    new System.Tuple<float, int>(2f, 10),
-    new System.Tuple<float, int>(1.8f, 15),
-    new System.Tuple<float, int>(1.6f, 15),
-    new System.Tuple<float, int>(1.4f, 20),
-    new System.Tuple<float, int>(1.2f, 25),
-    new System.Tuple<float, int>(1f, 25),
-    new System.Tuple<float, int>(0.8f, 30),
-    new System.Tuple<float, int>(0.5f, 50)
+    new WaveDefinition(0f, 0, 0, 0),
+    new WaveDefinition(2f, 10, 0, 0),
+    new WaveDefinition(1.8f, 15, 5, 0),
+    new WaveDefinition(1.7f, 20, 5, 0),
+    new WaveDefinition(1.6f, 25, 5, 1),
+    new WaveDefinition(1.5f, 0, 15, 2),
+    new WaveDefinition(1.4f, 35, 0, 5),
+    new WaveDefinition(1.3f, 50, 15, 0),
+    new WaveDefinition(1.2f, 50, 25, 5),
+    new WaveDefinition(1.1f, 75, 25, 0),
+    new WaveDefinition(1f, 100, 50, 10)
   };
 
   int _wave;
-  int _creaturesToSpawn;
   bool _interwave;
+  WaveCreatures _waveCreatures;
   float _waveTimer;
   // Start is called before the first frame update
   void Start()
@@ -29,6 +31,7 @@ public class GameController : MonoBehaviour
 
   public void ResetGame()
   {
+    FindObjectOfType<ArsenalController>().Init();
     var creatures = FindObjectsOfType<CreatureController>();
     for (var i = creatures.Length - 1; i >= 0; i--)
     {
@@ -58,8 +61,8 @@ public class GameController : MonoBehaviour
   {
     if (!_interwave) return;
     _interwave = false;
-    _creaturesToSpawn = wavesDefinition[_wave].Item2;
-    _waveTimer = wavesDefinition[_wave].Item1;
+    _waveCreatures = wavesDefinition[_wave].creatures;
+    _waveTimer = wavesDefinition[_wave].spawnDelay;
     FindObjectOfType<UIController>().SetStatusText(string.Format("Wave {0} inbound", _wave));
     SetLights();
   }
@@ -79,14 +82,13 @@ public class GameController : MonoBehaviour
     _waveTimer -= Time.deltaTime;
     if (_waveTimer <= 0)
     {
-      if (_creaturesToSpawn > 0)
+      if (!_waveCreatures.IsEmpty())
       {
         var spawners = FindObjectsOfType<SpawnerController>();
-        _creaturesToSpawn--;
-        spawners[Random.Range(0, spawners.Length)].Spawn();
+        spawners[Random.Range(0, spawners.Length)].Spawn(_waveCreatures.GetRandom());
         _waveTimer = 2;
       }
     }
-    if (_creaturesToSpawn <= 0 && FindObjectsOfType<CreatureController>().Length <= 0) EndWave();
+    if (_waveCreatures.IsEmpty() && FindObjectsOfType<CreatureController>().Length <= 0) EndWave();
   }
 }

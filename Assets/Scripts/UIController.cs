@@ -47,7 +47,11 @@ public class UIController : MonoBehaviour
   public void SetWorkbenchUI(bool active)
   {
     _workbenchUI.SetActive(active);
-    if (active) _workbenchUI.GetComponent<WorkbenchController>().RefreshPanel();
+    if (active)
+    {
+      _workbenchUI.GetComponent<WorkbenchController>().SetDataList(0);
+
+    }
     else _workbenchUI.GetComponent<WorkbenchController>().ClosePanel();
   }
 
