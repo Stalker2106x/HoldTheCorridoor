@@ -48,12 +48,16 @@ public class GameController : MonoBehaviour
     if (_interwave)
     {
       GameObject.Find("Level/NeonLeft/Light").GetComponent<Light>().color = Color.white;
+      GameObject.Find("Level/NeonLeft/SLight").GetComponent<Light>().color = Color.white;
       GameObject.Find("Level/NeonRight/Light").GetComponent<Light>().color = Color.white;
+      GameObject.Find("Level/NeonRight/SLight").GetComponent<Light>().color = Color.white;
     }
     else
     {
       GameObject.Find("Level/NeonLeft/Light").GetComponent<Light>().color = Color.red;
+      GameObject.Find("Level/NeonLeft/SLight").GetComponent<Light>().color = Color.red;
       GameObject.Find("Level/NeonRight/Light").GetComponent<Light>().color = Color.red;
+      GameObject.Find("Level/NeonRight/SLight").GetComponent<Light>().color = Color.red;
     }
   }
 

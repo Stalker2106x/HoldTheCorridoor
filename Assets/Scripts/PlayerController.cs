@@ -25,16 +25,19 @@ public class PlayerController : MonoBehaviour
   PlayerState _state;
   WeaponController _weapon;
 
+  Light _muzzleFlash;
   AudioSource _audioEmitter;
   Animator _animator;
   float _speed;
 
   float _stepTimer;
+  float _muzzleFlashTimer;
   // Start is called before the first frame update
   void Start()
   {
     _stepTimer = 0.5f;
     _animator = GetComponent<Animator>();
+    _muzzleFlash = transform.Find("MuzzleFlash").GetComponent<Light>();
     _audioEmitter = transform.Find("SoundEmitter").GetComponent<AudioSource>();
   }
 
@@ -84,6 +87,8 @@ public class PlayerController : MonoBehaviour
   {
     if (!_weapon.Fire()) return;
     _animator.SetTrigger("Attack");
+    _muzzleFlashTimer = 0.1f;
+    _muzzleFlash.enabled = true;
   }
 
   void Reload()
@@ -159,5 +164,10 @@ public class PlayerController : MonoBehaviour
       _audioEmitter.PlayOneShot(walkSounds[Random.Range(0, walkSounds.Length)]);
     }
     _animator.SetBool("Walking", move.magnitude != 0);
+    _muzzleFlashTimer -= Time.deltaTime;
+    if (_muzzleFlashTimer <= 0)
+    {
+      _muzzleFlash.enabled = false;
+    }
   }
 }

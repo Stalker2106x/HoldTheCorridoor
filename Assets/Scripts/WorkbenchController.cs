@@ -22,15 +22,20 @@ public class WorkbenchController : MonoBehaviour
     }
     transform.Find("WeaponSelect/UnlockPanel").gameObject.SetActive(false);
     var equipBtn = transform.Find("WeaponSelect/EquipBtn");
+    var equipBtnButton = equipBtn.GetComponent<Button>();
     equipBtn.gameObject.SetActive(true);
-    equipBtn.GetComponent<Button>().onClick.AddListener(() =>
+    equipBtnButton.onClick.RemoveAllListeners();
+    equipBtnButton.onClick.AddListener(() =>
     {
       FindObjectOfType<PlayerController>().Equip(FindObjectOfType<ArsenalController>().weapons[weaponIndex]);
     });
     var dataList = transform.Find("WeaponSelect/DataList");
     //DamageElement
     var damageElement = dataList.transform.Find("DamageElement");
-    damageElement.Find("UpgradeBtn").GetComponent<Button>().onClick.AddListener(() =>
+    var damageElementBtn = damageElement.Find("UpgradeBtn").GetComponent<Button>();
+
+    damageElementBtn.onClick.RemoveAllListeners();
+    damageElementBtn.onClick.AddListener(() =>
     {
       UpgradeDamage(weaponIndex);
     });
@@ -39,7 +44,11 @@ public class WorkbenchController : MonoBehaviour
     for (int i = 0; i < weapon.damageUpgrade; i++) damageUpgrades[i].GetComponent<Image>().color = Color.yellow;
     //MagazineElement
     var magazineElement = dataList.transform.Find("MagazineElement");
-    magazineElement.Find("UpgradeBtn").GetComponent<Button>().onClick.AddListener(() =>
+
+    var magazineElementBtn = magazineElement.Find("UpgradeBtn").GetComponent<Button>();
+
+    magazineElementBtn.onClick.RemoveAllListeners();
+    magazineElementBtn.onClick.AddListener(() =>
     {
       UpgradeMagazine(weaponIndex);
     });
@@ -64,7 +73,7 @@ public class WorkbenchController : MonoBehaviour
 
   public void ResetCheckStates(int weaponIndex)
   {
-    var scrollView = transform.Find("WeaponSelect/WeaponScroll/Viewport/Content");
+    var scrollView = transform.Find("/WeaponSelect/WeaponScroll/Viewport/Content");
     int index = 0;
     foreach (Transform child in scrollView)
     {
