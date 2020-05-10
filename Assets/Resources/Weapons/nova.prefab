@@ -51,7 +51,8 @@ MonoBehaviour:
   dryfireSound: {fileID: 8300000, guid: 5b7748ae9b2bf9340999dd3b5942803a, type: 3}
   damage: 45
   maxAmmo: 6
-  fireMode: 0
+  fireMode: 2
+  unlocked: 0
   damageUpgrade: 0
   magazineUpgrade: 0
 --- !u!82 &6085474960448129554

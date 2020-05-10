@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-enum WeaponState
+public enum WeaponState
 {
   Idle,
   Cooldown,
@@ -12,7 +12,8 @@ enum WeaponState
 public enum FireMode
 {
   SemiAuto,
-  Auto
+  Auto,
+  Burst
 }
 
 public class WeaponController : MonoBehaviour
@@ -49,15 +50,14 @@ public class WeaponController : MonoBehaviour
   // Start is called before the first frame update
   void Start()
   {
-    _cooldownTimer = 0.1f;
+    _audioEmitter = GetComponent<AudioSource>();
   }
 
   public void Init()
   {
-    _audioEmitter = GetComponent<AudioSource>();
     magazineUpgrade = 0;
     damageUpgrade = 0;
-    _state = WeaponState.Idle;
+    SetState(WeaponState.Idle);
     _ammo = maxAmmo;
     UpdateUI();
   }
@@ -67,20 +67,52 @@ public class WeaponController : MonoBehaviour
     FindObjectOfType<UIController>().SetAmmoIndicator(_ammo, maxAmmo + (magazineUpgrade * 2));
   }
 
+  void SetState(WeaponState state)
+  {
+    _state = state;
+    switch (state)
+    {
+      case WeaponState.Idle:
+        break;
+      case WeaponState.Cooldown:
+        _cooldownTimer = 0.1f;
+        break;
+      case WeaponState.Reloading:
+        _reloadTimer = 1.2f;
+        break;
+    }
+  }
+
   public bool Fire()
   {
     if (_state != WeaponState.Idle) return (false);
     if (_ammo == 0)
     {
-      if (_ammo == 0) _audioEmitter.PlayOneShot(dryfireSound);
+      if (_ammo == 0)
+      {
+        SetState(WeaponState.Cooldown);
+        _audioEmitter.PlayOneShot(dryfireSound);
+      }
       return (false);
     }
     _audioEmitter.PlayOneShot(gunshotSound);
-    var target = new Vector3(transform.position.x, 2, transform.position.z) + transform.forward;
-    var bullet = Instantiate(bulletPrefab, target, transform.rotation);
-    bullet.GetComponent<BulletController>().damage = (int)(damage * (1 + (damageUpgrade * 0.25f)));
+    var target = new Vector3(transform.position.x - 0.1f, 2, transform.position.z) + transform.forward;
+    if (fireMode == FireMode.Burst)
+    {
+      for (int i = 0; i < 6; i++)
+      {
+        var bullet = Instantiate(bulletPrefab, target - new Vector3(0, 0, 0.2f * i), transform.rotation);
+        bullet.transform.Rotate(0f, Random.Range(2, 10) * (Random.Range(0,2) == 0 ? 1 : -1), 0f);
+        bullet.GetComponent<BulletController>().damage = (int)(damage * (1 + (damageUpgrade * 0.25f)));
+      }
+    }
+    else
+    {
+      var bullet = Instantiate(bulletPrefab, target, transform.rotation);
+      bullet.GetComponent<BulletController>().damage = (int)(damage * (1 + (damageUpgrade * 0.25f)));
+    }
+    SetState(WeaponState.Cooldown);
     _ammo--;
-    _state = WeaponState.Cooldown;
     UpdateUI();
     return (true);
   }
@@ -89,8 +121,7 @@ public class WeaponController : MonoBehaviour
   {
     if (_ammo == maxAmmo + (magazineUpgrade * 2) || _state == WeaponState.Reloading) return (false);
     _audioEmitter.PlayOneShot(reloadSound);
-    _state = WeaponState.Reloading;
-    _reloadTimer = 1.2f;
+    SetState(WeaponState.Reloading);
     return (true);
   }
 
@@ -117,8 +148,7 @@ public class WeaponController : MonoBehaviour
       _cooldownTimer -= Time.deltaTime;
       if (_cooldownTimer <= 0)
       {
-        _state = WeaponState.Idle;
-        _cooldownTimer = 0.1f;
+        SetState(WeaponState.Idle);
       }
     }
   }

@@ -31,6 +31,7 @@ public class GameController : MonoBehaviour
 
   public void ResetGame()
   {
+    _interwave = true;
     FindObjectOfType<ArsenalController>().Init();
     var creatures = FindObjectsOfType<CreatureController>();
     for (var i = creatures.Length - 1; i >= 0; i--)
@@ -40,6 +41,7 @@ public class GameController : MonoBehaviour
     FindObjectOfType<UIController>().SetGameOverUI(false);
     FindObjectOfType<PlayerController>().Init();
     _wave = 0;
+    _waveTimer = 0;
     EndWave();
   }
 
@@ -66,7 +68,6 @@ public class GameController : MonoBehaviour
     if (!_interwave) return;
     _interwave = false;
     _waveCreatures = wavesDefinition[_wave].creatures;
-    _waveTimer = wavesDefinition[_wave].spawnDelay;
     FindObjectOfType<UIController>().SetStatusText(string.Format("Wave {0} inbound", _wave));
     SetLights();
   }
@@ -82,6 +83,7 @@ public class GameController : MonoBehaviour
   // Update is called once per frame
   void Update()
   {
+    if (Input.GetKeyDown(KeyCode.Escape)) Application.Quit();
     if (_interwave) return;
     _waveTimer -= Time.deltaTime;
     if (_waveTimer <= 0)
@@ -90,8 +92,8 @@ public class GameController : MonoBehaviour
       {
         var spawners = FindObjectsOfType<SpawnerController>();
         spawners[Random.Range(0, spawners.Length)].Spawn(_waveCreatures.GetRandom());
-        _waveTimer = 2;
       }
+      _waveTimer = wavesDefinition[_wave].spawnDelay;
     }
     if (_waveCreatures.IsEmpty() && FindObjectsOfType<CreatureController>().Length <= 0) EndWave();
   }

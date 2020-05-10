@@ -12,6 +12,7 @@ public class ArsenalController : MonoBehaviour
 
   public void Init()
   {
+    weapons.Clear();
     AddWeapon(Resources.Load<GameObject>("Weapons/glock"), true);
     AddWeapon(Resources.Load<GameObject>("Weapons/mac10"), false);
     AddWeapon(Resources.Load<GameObject>("Weapons/nova"), false);
@@ -23,6 +24,7 @@ public class ArsenalController : MonoBehaviour
     var weaponController = weaponObj.GetComponent<WeaponController>();
     weaponObj.gameObject.name = "Weapon";
     weaponController.unlocked = unlocked;
+    weaponController.Init();
     weaponObj.SetActive(false);
     weapons.Add(weaponObj);
   }

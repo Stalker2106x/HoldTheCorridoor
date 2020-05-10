@@ -73,13 +73,13 @@ public class SpawnerController : MonoBehaviour
     {
       default:
       case CreatureType.Normal:
-        creatureController.Init(60, 10, 2.5f);
+        creatureController.Init(60, 20, 4f, 25, Color.white);
         break;
       case CreatureType.Rusher:
-        creatureController.Init(50, 10, 5f);
+        creatureController.Init(50, 15, 6f, 35, Color.yellow);
         break;
       case CreatureType.Juggernaut:
-        creatureController.Init(180, 40, 1.5f);
+        creatureController.Init(180, 40, 2.5f, 100, Color.red);
         break;
     }
   }

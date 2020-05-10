@@ -11,9 +11,11 @@ public class CreatureController : MonoBehaviour
 
   Animator _animator;
   AudioSource _audioEmitter;
+  Color _color;
   float _speed;
   int _health;
   int _damage;
+  int _reward;
 
   float _attackTimer;
   float _soundTimer;
@@ -24,13 +26,16 @@ public class CreatureController : MonoBehaviour
     _attackTimer = 0f;
     _animator = GetComponent<Animator>();
     _audioEmitter = GetComponent<AudioSource>();
+    transform.Find("SM_Skeleton_Base").GetComponent<SkinnedMeshRenderer>().materials[0].color = _color;
   }
 
-  public void Init(int health, int damage, float speed)
+  public void Init(int health, int damage, float speed, int reward, Color color)
   {
     _health = health;
     _damage = damage;
     _speed = speed;
+    _reward = reward;
+    _color = color;
   }
 
   private void OnCollisionEnter(Collision collision)
@@ -43,7 +48,7 @@ public class CreatureController : MonoBehaviour
       _health -= bullet.damage;
       if (_health <= 0)
       {
-        FindObjectOfType<PlayerController>().AddResource(20);
+        FindObjectOfType<PlayerController>().AddResource(_reward);
         Destroy(gameObject);
       }
     }

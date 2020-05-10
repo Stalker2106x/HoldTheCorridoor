@@ -16,6 +16,8 @@ public class PlayerController : MonoBehaviour
   [SerializeField]
   AudioClip upgradeSound;
   [SerializeField]
+  AudioClip equipSound;
+  [SerializeField]
   AudioClip[] walkSounds;
 
   public int speedUpgrade;
@@ -43,13 +45,17 @@ public class PlayerController : MonoBehaviour
 
   public void Init()
   {
-    Equip(FindObjectOfType<ArsenalController>().weapons[0]);
+    //Equip default
+    var weapon = FindObjectOfType<ArsenalController>().weapons[0];
+    weapon.SetActive(true);
+    weapon.transform.SetParent(gameObject.transform, false);
+    _weapon = transform.Find("Weapon").GetComponent<WeaponController>();
+    //Base Init
     _state = PlayerState.Active;
     _health = 100;
-    _resources = 75000;
+    _resources = 0;
     _speed = 5;
     transform.position = new Vector3(31.14f, 1f, 12.61f);
-    _weapon.Init();
     //Update UI
     FindObjectOfType<UIController>().SetHealthIndicator(_health);
     FindObjectOfType<UIController>().SetResourcesIndicator(_resources);
@@ -58,17 +64,18 @@ public class PlayerController : MonoBehaviour
   public void Equip(GameObject weapon)
   {
     //Unequip previous
-    if (_weapon)
+    if (_weapon != null)
     {
       var oldWeapon = _weapon.gameObject;
       oldWeapon.SetActive(false);
-      oldWeapon.transform.parent = FindObjectOfType<WorkbenchController>().transform;
+      oldWeapon.transform.SetParent(FindObjectOfType<WorkbenchController>().gameObject.transform, false);
     }
     //Equip new
     weapon.SetActive(true);
     weapon.transform.SetParent(gameObject.transform, false);
     _weapon = transform.Find("Weapon").GetComponent<WeaponController>();
-
+    _weapon.UpdateUI();
+    _audioEmitter.PlayOneShot(equipSound);
   }
 
   public void SetState(PlayerState state)
@@ -153,7 +160,7 @@ public class PlayerController : MonoBehaviour
       var target = new Vector3(hit.point.x, transform.position.y, hit.point.z);
       transform.LookAt(target);
     }
-    if (Input.GetMouseButton(0) && _weapon.fireMode == FireMode.Auto || Input.GetMouseButtonDown(0) && _weapon.fireMode == FireMode.SemiAuto) Fire();
+    if (Input.GetMouseButton(0) && _weapon.fireMode == FireMode.Auto || Input.GetMouseButtonDown(0) && _weapon.fireMode != FireMode.Auto) Fire();
     if (Input.GetKeyDown(KeyCode.R)) Reload();
     if (Input.GetKeyDown(KeyCode.E)) Interact();
     transform.Translate(move * _speed * Time.deltaTime, Space.World);
