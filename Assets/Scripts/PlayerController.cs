@@ -132,11 +132,11 @@ public class PlayerController : MonoBehaviour
 
   void Interact()
   {
-    if (Vector3.Distance(transform.position, FindObjectOfType<SwitchController>().transform.position) < 4)
+    if (Vector3.Distance(transform.position, FindObjectOfType<SwitchController>().transform.position) < 3f)
     {
       FindObjectOfType<GameController>().SetWave();
     }
-    if (Vector3.Distance(transform.position, GameObject.Find("Workbench").transform.position) < 4)
+    if (Vector3.Distance(transform.position, GameObject.Find("Workbench").transform.position) < 2.5f)
     {
       SetState(PlayerState.Inactive);
       FindObjectOfType<UIController>().SetWorkbenchUI(true);

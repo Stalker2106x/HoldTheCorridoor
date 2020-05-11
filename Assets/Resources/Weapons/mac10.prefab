@@ -46,12 +46,17 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   bulletPrefab: {fileID: 4542134947511959723, guid: 6722a191a0b15b347a6a214b0aee828d,
     type: 3}
-  gunshotSound: {fileID: 8300000, guid: 309899f3ad33b1b4baf693724d02edc0, type: 3}
+  gunshotSound: {fileID: 8300000, guid: 42e3480451c9ebb4faf9809a44278de0, type: 3}
   reloadSound: {fileID: 8300000, guid: 40089b3602c9c5b428c911a6cd4e6a90, type: 3}
   dryfireSound: {fileID: 8300000, guid: 5b7748ae9b2bf9340999dd3b5942803a, type: 3}
   damage: 10
+  bulletsPerShot: 1
   maxAmmo: 30
+  accuracy: 80
+  cooldownDelay: 0.05
+  reloadDelay: 2
   fireMode: 1
+  unlocked: 0
   damageUpgrade: 0
   magazineUpgrade: 0
 --- !u!82 &1161120704630192495

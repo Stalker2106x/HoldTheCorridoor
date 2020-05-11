@@ -31,7 +31,19 @@ public class WeaponController : MonoBehaviour
   int damage;
 
   [SerializeField]
-  int maxAmmo = 10;
+  int bulletsPerShot;
+
+  [SerializeField]
+  int maxAmmo;
+
+  [SerializeField]
+  int accuracy;
+
+  [SerializeField]
+  float cooldownDelay;
+
+  [SerializeField]
+  float reloadDelay;
 
   [SerializeField]
   public FireMode fireMode;
@@ -75,10 +87,10 @@ public class WeaponController : MonoBehaviour
       case WeaponState.Idle:
         break;
       case WeaponState.Cooldown:
-        _cooldownTimer = 0.1f;
+        _cooldownTimer = cooldownDelay;
         break;
       case WeaponState.Reloading:
-        _reloadTimer = 1.2f;
+        _reloadTimer = reloadDelay;
         break;
     }
   }
@@ -97,18 +109,10 @@ public class WeaponController : MonoBehaviour
     }
     _audioEmitter.PlayOneShot(gunshotSound);
     var target = new Vector3(transform.position.x - 0.1f, 2, transform.position.z) + transform.forward;
-    if (fireMode == FireMode.Burst)
+    for (int i = 0; i < bulletsPerShot; i++)
     {
-      for (int i = 0; i < 6; i++)
-      {
-        var bullet = Instantiate(bulletPrefab, target - new Vector3(0, 0, 0.2f * i), transform.rotation);
-        bullet.transform.Rotate(0f, Random.Range(2, 10) * (Random.Range(0,2) == 0 ? 1 : -1), 0f);
-        bullet.GetComponent<BulletController>().damage = (int)(damage * (1 + (damageUpgrade * 0.25f)));
-      }
-    }
-    else
-    {
-      var bullet = Instantiate(bulletPrefab, target, transform.rotation);
+      var bullet = Instantiate(bulletPrefab, target - new Vector3(0, 0, 0.2f * i), transform.rotation);
+      bullet.transform.Rotate(0f, Random.Range(0, (100 - accuracy)/2) * (Random.Range(0, 2) == 0 ? 1 : -1), 0f);
       bullet.GetComponent<BulletController>().damage = (int)(damage * (1 + (damageUpgrade * 0.25f)));
     }
     SetState(WeaponState.Cooldown);

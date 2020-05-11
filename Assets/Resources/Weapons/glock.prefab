@@ -50,8 +50,13 @@ MonoBehaviour:
   reloadSound: {fileID: 8300000, guid: 40089b3602c9c5b428c911a6cd4e6a90, type: 3}
   dryfireSound: {fileID: 8300000, guid: 5b7748ae9b2bf9340999dd3b5942803a, type: 3}
   damage: 20
+  bulletsPerShot: 1
   maxAmmo: 12
+  accuracy: 90
+  cooldownDelay: 0.1
+  reloadDelay: 1
   fireMode: 0
+  unlocked: 0
   damageUpgrade: 0
   magazineUpgrade: 0
 --- !u!82 &7810396855311372111

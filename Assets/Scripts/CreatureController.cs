@@ -60,7 +60,7 @@ public class CreatureController : MonoBehaviour
     var mainPlayer = FindObjectOfType<PlayerController>();
     transform.LookAt(mainPlayer.transform);
     _attackTimer -= Time.deltaTime;
-    if (Vector3.Distance(transform.position, mainPlayer.transform.position) > 2.5f) //Walk to player
+    if (Vector3.Distance(transform.position, mainPlayer.transform.position) > 1.5f) //Walk to player
     {
       _animator.SetBool("Walking", true);
       transform.position = Vector3.MoveTowards(transform.position, mainPlayer.transform.position, _speed * Time.deltaTime);

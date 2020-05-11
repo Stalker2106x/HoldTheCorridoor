@@ -4,20 +4,7 @@ using UnityEngine;
 
 public class GameController : MonoBehaviour
 {
-  List<WaveDefinition> wavesDefinition = new List <WaveDefinition>
-  {
-    new WaveDefinition(0f, 0, 0, 0),
-    new WaveDefinition(2f, 10, 0, 0),
-    new WaveDefinition(1.8f, 15, 5, 0),
-    new WaveDefinition(1.7f, 20, 5, 0),
-    new WaveDefinition(1.6f, 25, 5, 1),
-    new WaveDefinition(1.5f, 0, 15, 2),
-    new WaveDefinition(1.4f, 35, 0, 5),
-    new WaveDefinition(1.3f, 50, 15, 0),
-    new WaveDefinition(1.2f, 50, 25, 5),
-    new WaveDefinition(1.1f, 75, 25, 0),
-    new WaveDefinition(1f, 100, 50, 10)
-  };
+  List<WaveDefinition> wavesDefinition;
 
   int _wave;
   bool _interwave;
@@ -31,6 +18,20 @@ public class GameController : MonoBehaviour
 
   public void ResetGame()
   {
+    wavesDefinition = new List<WaveDefinition>
+    {
+      new WaveDefinition(0f, 0, 0, 0),
+      new WaveDefinition(2f, 10, 0, 0),
+      new WaveDefinition(1.8f, 15, 5, 0),
+      new WaveDefinition(1.7f, 20, 5, 0),
+      new WaveDefinition(1.6f, 25, 5, 1),
+      new WaveDefinition(1.5f, 0, 15, 2),
+      new WaveDefinition(1.4f, 35, 0, 5),
+      new WaveDefinition(1.3f, 50, 15, 0),
+      new WaveDefinition(1.2f, 50, 25, 5),
+      new WaveDefinition(1.1f, 75, 25, 0),
+      new WaveDefinition(1f, 100, 50, 10)
+    };
     _interwave = true;
     FindObjectOfType<ArsenalController>().Init();
     var creatures = FindObjectsOfType<CreatureController>();
@@ -53,6 +54,8 @@ public class GameController : MonoBehaviour
       GameObject.Find("Level/NeonLeft/SLight").GetComponent<Light>().color = Color.white;
       GameObject.Find("Level/NeonRight/Light").GetComponent<Light>().color = Color.white;
       GameObject.Find("Level/NeonRight/SLight").GetComponent<Light>().color = Color.white;
+      GameObject.Find("Level/NeonCenter/Light").GetComponent<Light>().color = Color.white;
+      GameObject.Find("Level/NeonCenter/SLight").GetComponent<Light>().color = Color.white;
     }
     else
     {
@@ -60,6 +63,8 @@ public class GameController : MonoBehaviour
       GameObject.Find("Level/NeonLeft/SLight").GetComponent<Light>().color = Color.red;
       GameObject.Find("Level/NeonRight/Light").GetComponent<Light>().color = Color.red;
       GameObject.Find("Level/NeonRight/SLight").GetComponent<Light>().color = Color.red;
+      GameObject.Find("Level/NeonCenter/Light").GetComponent<Light>().color = Color.red;
+      GameObject.Find("Level/NeonCenter/SLight").GetComponent<Light>().color = Color.red;
     }
   }
 
@@ -83,7 +88,6 @@ public class GameController : MonoBehaviour
   // Update is called once per frame
   void Update()
   {
-    if (Input.GetKeyDown(KeyCode.Escape)) Application.Quit();
     if (_interwave) return;
     _waveTimer -= Time.deltaTime;
     if (_waveTimer <= 0)

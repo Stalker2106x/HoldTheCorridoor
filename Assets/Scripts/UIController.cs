@@ -9,6 +9,7 @@ public class UIController : MonoBehaviour
   Text _healthIndicator;
   Text _resourcesIndicator;
   Text _ammoIndicator;
+  GameObject _gameMenu;
   GameObject _gameOverUI;
   GameObject _workbenchUI;
 
@@ -19,8 +20,13 @@ public class UIController : MonoBehaviour
     _healthIndicator = transform.Find("HealthIndicator").GetComponent<Text>();
     _resourcesIndicator = transform.Find("ResourcesIndicator").GetComponent<Text>();
     _ammoIndicator = transform.Find("AmmoIndicator").GetComponent<Text>();
+    _gameMenu = transform.Find("GameMenu").gameObject;
     _gameOverUI = transform.Find("GameOverUI").gameObject;
     _workbenchUI = transform.Find("WorkbenchUI").gameObject;
+  }
+  public void SetMusicVolume(float volume)
+  {
+    Camera.main.GetComponent<AudioSource>().volume = volume;
   }
 
   public void SetStatusText(string text)
@@ -55,9 +61,26 @@ public class UIController : MonoBehaviour
     else _workbenchUI.GetComponent<WorkbenchController>().ClosePanel();
   }
 
+  public void ExitGame()
+  {
+    Application.Quit();
+  }
+
   // Update is called once per frame
   void Update()
   {
-        
+    if (Input.GetKeyDown(KeyCode.Escape))
+    {
+      if (_gameMenu.activeSelf)
+      {
+        _gameMenu.SetActive(false);
+        FindObjectOfType<PlayerController>().SetState(PlayerState.Active);
+      }
+      else
+      {
+        _gameMenu.SetActive(true);
+        FindObjectOfType<PlayerController>().SetState(PlayerState.Inactive);
+      }
+    }
   }
 }

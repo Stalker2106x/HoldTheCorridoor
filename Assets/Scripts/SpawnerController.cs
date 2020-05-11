@@ -60,14 +60,18 @@ public class SpawnerController : MonoBehaviour
   [SerializeField]
   GameObject creaturePrefab;
 
+  MeshFilter _mesh;
+
   // Start is called before the first frame update
   void Start()
   {
+    _mesh = GetComponent<MeshFilter>();
   }
 
   public void Spawn(CreatureType type)
   {
-    var creature = Instantiate(creaturePrefab, transform.position, Quaternion.identity);
+    Vector3 pos = new Vector3(transform.position.x + Random.Range(-_mesh.mesh.bounds.extents.x, _mesh.mesh.bounds.extents.x), 2, transform.position.z + Random.Range(-_mesh.mesh.bounds.extents.z, _mesh.mesh.bounds.extents.z));
+    var creature = Instantiate(creaturePrefab, pos, Quaternion.identity);
     var creatureController = creature.GetComponent<CreatureController>();
     switch (type)
     {
